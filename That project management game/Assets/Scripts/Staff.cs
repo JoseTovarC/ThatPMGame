@@ -12,8 +12,8 @@ public class Staff : MonoBehaviour
     string color;
     string ritmo;
     public string costo;
-    
-    
+
+
     // textos
     public Text recursostext;
     public Text names;
@@ -23,19 +23,18 @@ public class Staff : MonoBehaviour
     // elementos de juego
     public static List<Staff> empleados;
     public static int presupuesto;
+    public static Staff ActStaff;
     
-    
-    public Staff(string nom, string col, string rit, string cos)
+    private void Awake()
     {
-        this.nombre = nom;
-        this.color = col;
-        this.ritmo = rit;
-        this.costo = cos;
-
-    }
-
-     void Start()
-    {
+        if (ActStaff == null)
+        {
+            ActStaff = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
         List<Staff> aux = new List<Staff>();
         empleados = aux;
         Staff staff1 = new Staff("Vicky", "#1C00FF", "Average", "Average");
@@ -58,7 +57,27 @@ public class Staff : MonoBehaviour
         empleados.Add(staff8);
         empleados.Add(staff9);
         empleados.Add(staff10);
-        empleados.Shuff(10);  
+        empleados.Shuff(10); 
+    }
+    
+    
+    public Staff(string nom, string col, string rit, string cos)
+    {
+        this.nombre = nom;
+        this.color = col;
+        this.ritmo = rit;
+        this.costo = cos;
+
+    }
+
+    public Staff()
+    {
+        
+    }
+
+     void Start()
+    {
+ 
         recursostext.text = empleados[0].mostrar() + "\n" +  empleados[1].mostrar() + "\n" +  empleados[2].mostrar() + "\n" + empleados[3].mostrar();
         names.text = empleados[0].getNombre() + "\n" + empleados[1].getNombre() + "\n" + empleados[2].getNombre() + "\n" + empleados[3].getNombre();
         presupuesto = Random.Range(720, 999)*1000;
@@ -88,7 +107,10 @@ public class Staff : MonoBehaviour
         return this.nombre;
     }
     // Start is called before the first frame update
-
+    public static List<Staff> mandame_lista()
+    {
+        return empleados;
+    }
 
 
 }
