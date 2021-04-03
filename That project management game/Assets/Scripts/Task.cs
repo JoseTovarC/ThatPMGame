@@ -1,16 +1,37 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Task : MonoBehaviour
 {
+    
+    //caracteristicas de las tareas
+    public int[] gasta = new int[5]{0,0,0,0,0};
+    public int[] pre = new int[5];
     public List<Slider> tareas = new List<Slider>();
+    public Staff[] assingstaff = new Staff[5];
+    public static Task ActTask;
+    
+    
+    //para desarrollo de juego
     public Transform puntoinicio;
     public Transform puntofinal;
     public List<GameObject> relleno_tareas = new List<GameObject>();
-    public static Task ActTask;
     System.Random random = new System.Random();
+    public List<Image> fondos = new List<Image>();
+    public Gradient gradient;
+    
+    
+    //textos
+    public Text prueba;
+    public Text spent;
+    public Text totalspent;
+    public Text warning;
+    
+
     
     // Start is called before the first frame update
     private void Awake()
@@ -72,11 +93,18 @@ public class Task : MonoBehaviour
         tareamedio.maxValue = valor;
         tareamedio.minValue = val;
         relleno_tareas[ramdonIndex_mitad].GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, pos_x, pos_x_final - pos_x);
+        fondos[randomIndex].color = gradient.Evaluate(0f);
+        fondos[ramdonIndex_mitad].color = gradient.Evaluate(0f);
+        fondos[randomIndex_final].color = gradient.Evaluate(0f);
+        pre[randomIndex_final] = ramdonIndex_mitad;
+        pre[ramdonIndex_mitad] = randomIndex;
+        pre[randomIndex] = -1;
         indices.RemoveAt(randomIndex_final);
         indices.RemoveAt(ramdonIndex_mitad);
         indices.RemoveAt(randomIndex);
         foreach(var i in indices)
         {
+            pre[i] = -1;
             float minimo = 1f;
             float maximo = 5.58f;
             float val1 = (float) (random.NextDouble() * (maximo - minimo) + minimo);
@@ -91,6 +119,7 @@ public class Task : MonoBehaviour
             relleno_tareas[i].GetComponent<RectTransform>().SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, valor_x1, valor_x2 - valor_x1);
             tareas[i].minValue = val1;
             tareas[i].maxValue = val2;
+            fondos[i].color = gradient.Evaluate(0f);
 
         }
         
@@ -99,8 +128,82 @@ public class Task : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
+    public void estoyavanzando()
+    { 
+        List<int> simulstaff= new List<int>();
+        Dictionary<string, int> simultask = new Dictionary<string, int>();  
+        for (int i = 0; i < assingstaff.Length; i++)
+        {
+            
+            if (Timeline.instancetime.sltime.value >= tareas[i].minValue  && !(pre[i]>0 ) && tareas[i].value < tareas[i].maxValue)
+            {
+               simulstaff.Add(i); 
+            }
+            else if ( pre[i]>0 && tareas[pre[i]].value>=tareas[pre[i]].maxValue)
+            {
+                simulstaff.Add(i);
+            }
+        }
+
+        foreach (var s in simulstaff)
+        {
+            if(simultask.ContainsKey(assingstaff[s].getNombre()))
+            {
+                
+                int contador = simultask[assingstaff[s].getNombre()] + 1;
+                simultask.Remove(assingstaff[s].getNombre());
+                simultask.Add(assingstaff[s].getNombre(),contador);
+            }
+            else
+            {
+                simultask.Add(assingstaff[s].getNombre(),1);
+            }
+        }
+        for (int i = 0; i < assingstaff.Length; i++)
+            
+        {
+            if ((pre[i]>=0 && tareas[pre[i]].value>=tareas[pre[i]].maxValue))
+            {
+                if (simultask.ContainsKey(assingstaff[i].getNombre()))
+                {
+                    assingstaff[i].canttareas = simultask[assingstaff[i].getNombre()]; 
+                    prueba.text = "Staff: " + assingstaff[i].getNombre() + " hace: " + simultask[assingstaff[i].getNombre()]+ " tareas";
+                
+                } 
+                assingstaff[i].variavelocidad();
+                float deltachiquito = Time.deltaTime/(assingstaff[i].demora*assingstaff[i].canttareas);
+                if (Time.timeScale == 1)
+                {
+                    gasta[i] = gasta[i] + assingstaff[i].cobra;  
+                }
+                tareas[i].value = tareas[i].value + deltachiquito;
+                fondos[i].color = gradient.Evaluate(tareas[i].normalizedValue);
+               
+
+            }
+            else if (Timeline.instancetime.sltime.value >= tareas[i].minValue && !(pre[i]>=0 ))
+            {
+                if (simultask.ContainsKey(assingstaff[i].getNombre()))
+                {
+                   assingstaff[i].canttareas = simultask[assingstaff[i].getNombre()]; 
+                   prueba.text = "Staff: " + assingstaff[i].getNombre() + "hace: " + simultask[assingstaff[i].getNombre()]+ " tareas";
+                
+                } 
+                assingstaff[i].variavelocidad();
+                float deltachiquito = Time.deltaTime/(assingstaff[i].demora*assingstaff[i].canttareas);
+                if (Time.timeScale == 1)
+                {
+                  gasta[i] = gasta[i] + assingstaff[i].cobra;  
+                }
+                tareas[i].value = tareas[i].value + deltachiquito;
+                fondos[i].color = gradient.Evaluate(tareas[i].normalizedValue);
+               
+
+            }
+           
+        }
+        spent.text = "$" + (gasta[0] / 1000) + "K\n" + "$" + (gasta[1] / 1000) + "K\n" + "$" + (gasta[2] / 1000) +
+                     "K\n" + "$" + (gasta[3] / 1000) + "K\n" + "$" + (gasta[4] / 1000) + "K";
+        totalspent.text = "$" + ((gasta[0] + gasta[1] + gasta[2] + gasta[3] + gasta[4]) / 1000) + "K";
     }
 }

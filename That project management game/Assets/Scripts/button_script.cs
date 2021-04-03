@@ -39,8 +39,8 @@ public class button_script : MonoBehaviour
     {
         if (actTime < maxtime)
         {
-            prueba += Time.deltaTime;
-            actTime = (float)(prueba/5.7f);
+            float puntodif = Time.deltaTime/prueba;
+            actTime += puntodif;
             lineadetiempo.setTime(actTime);
         }
         else

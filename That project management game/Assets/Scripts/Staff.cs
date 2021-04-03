@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using ExitGames.Client.Photon.StructWrapping;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,19 +12,35 @@ public class Staff : MonoBehaviour
     string nombre;
     string color;
     string ritmo;
-    public string costo;
-
+    string costo;
+    public int cobra;
+    public float demora;
+    public int canttareas=1;
+    
 
     // textos
     public Text recursostext;
     public Text names;
     public Text budget;
-    
+    public Text tareas_txt;
     
     // elementos de juego
     public static List<Staff> empleados;
     public static int presupuesto;
     public static Staff ActStaff;
+    public string[] tareas_random =
+    {
+        "-Build the thingamabob",
+        "-Test the gizmo",
+        "-Retool the thingumajig",
+        "-Calibrate the doohickey",
+        "-Sample some widgets",
+        "-Restart the thingy",
+        "-Calibrate the contraption",
+        "-Realign the doodad",
+        "-Mobile whatchamacalli",
+        "-Do that other thing"
+    };
     
     private void Awake()
     {
@@ -67,9 +84,44 @@ public class Staff : MonoBehaviour
         this.color = col;
         this.ritmo = rit;
         this.costo = cos;
-
+        if (cos.Equals("Expensive"))
+        {
+            cobra = 12*2;
+        }
+        else if (cobra.Equals("Average"))
+        {
+            cobra = 8*2;
+        }
+        else
+        {
+            cobra = 4*2;
+        }
+        
     }
 
+    public void variavelocidad()
+    {
+        System.Random random = new System.Random();
+        float minimo;
+        float maximo;
+        if (ritmo.Equals("Fast"))
+        {
+            minimo = 3f; 
+            maximo = 5.6f;
+            
+        }
+        else if(ritmo.Equals("Average"))
+        {
+            minimo = 5f;
+            maximo = 7f;
+        }
+        else
+        {
+            minimo = 6f;
+            maximo = 11f;
+        }
+        demora = (float) (random.NextDouble() * (maximo - minimo) + minimo);
+    }
     public Staff()
     {
         
@@ -82,6 +134,9 @@ public class Staff : MonoBehaviour
         names.text = empleados[0].getNombre() + "\n" + empleados[1].getNombre() + "\n" + empleados[2].getNombre() + "\n" + empleados[3].getNombre();
         presupuesto = Random.Range(720, 999)*1000;
         budget.text = "Your budget: $"+ (presupuesto / 1000) + "," + "000";
+        tareas_random.Shuff(10);
+        tareas_txt.text = tareas_random[0] + "\n" + tareas_random[1] + "\n" + tareas_random[2] + "\n" +
+                          tareas_random[3] + "\n" + tareas_random[4];
     }
 
     public string mostrar()

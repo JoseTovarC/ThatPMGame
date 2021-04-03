@@ -7,12 +7,24 @@ public class Timeline : MonoBehaviour
 {
     public Slider sltime;
     public Vector3 direccion;
+    public static Timeline instancetime;
     public void setTime(float tiempo)
     {
         sltime.value = tiempo;
-        
+        Task.ActTask.estoyavanzando();
+
     }
- 
+    private void Awake()
+    {
+        if (instancetime == null)
+        {
+            instancetime = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     public void setMaxTime(float aux,float puntoPartida)
     {
         sltime.value = puntoPartida;

@@ -14,4 +14,14 @@ public static class Shuffle
             list[0] = temp;
         }
     }
+    public static void Shuff<T>(this T[] array,int ShuffleAccuracy)
+    {
+        for (int i = 0; i < ShuffleAccuracy; i++)
+        {
+            int randomIndex = Random.Range(1, array.Length);
+            T temp = array[randomIndex];
+            array[randomIndex] = array[0];
+            array[0] = temp;
+        }
+    }
 }
